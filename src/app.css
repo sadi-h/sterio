@@ -8,12 +8,13 @@
 }
 :root {
   --gap: 5px;
-  --blur: 7px;
+  --blur: 10px;
   --border-radius: 10px;
   --svg-size: 20px;
   --hover-color: #42cde7;
   --active-color: #abf1be;
   --text-color: #eff4f5;
+  --white-color: #eff4f5;
   --tertiary-color: #e9bfa6;
   --background-color: #264f73;
 }

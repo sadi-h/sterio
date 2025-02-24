@@ -1,6 +1,6 @@
 use std::{path::PathBuf, sync::Mutex, time::Duration};
 
-use tauri::{ipc::Channel, AppHandle, State, WebviewUrl, WebviewWindowBuilder};
+use tauri::{ipc::Channel, AppHandle, PhysicalPosition, State, WebviewUrl, WebviewWindowBuilder};
 
 use super::{action::Action, player::Player};
 
@@ -163,17 +163,43 @@ pub fn cover(
 }
 
 #[tauri::command]
-pub fn new_window(app: AppHandle) -> Result<String, String> /* Result<String, String> */ {
-    let window = WebviewWindowBuilder::new(&app, "Library", WebviewUrl::App("/library".into()))
-        .inner_size(500f64, 500f64)
+pub fn music_window(app: AppHandle) -> Result<String, String> /* Result<String, String> */ {
+    let window = WebviewWindowBuilder::new(&app, "Music", WebviewUrl::App("/music".into()))
+        .inner_size(390f64, 500f64)
         .build()
+        .map_err(|e| e.to_string())?;
+    window
+        .set_position(PhysicalPosition { x: 2565, y: 410 })
         .map_err(|e| e.to_string())?;
     window.show().map_err(|e| e.to_string())?;
     window.set_title("").map_err(|e| e.to_string())?;
-    #[cfg(debug_assertions)] //only include in debug mode
+    // INFO: uncomment for devtools during dev
+    /* #[cfg(debug_assertions)] //only include in debug mode
     {
         window.open_devtools();
         window.close_devtools();
-    };
+    }; */
+    Ok("success".to_string())
+}
+
+#[tauri::command]
+pub fn video_window(app: AppHandle) -> Result<String, String> /* Result<String, String> */ {
+    let window = WebviewWindowBuilder::new(&app, "Video", WebviewUrl::App("/video".into()))
+        .inner_size(390f64, 500f64)
+        .build()
+        .map_err(|e| e.to_string())?;
+    window
+        .set_position(PhysicalPosition { x: 2565, y: 410 })
+        .map_err(|e| e.to_string())?;
+    window.show().map_err(|e| e.to_string())?;
+    window.set_title("").map_err(|e| e.to_string())?;
+
+    // INFO: uncomment for devtools during dev
+
+    /* #[cfg(debug_assertions)] //only include in debug mode
+    {
+        window.open_devtools();
+        window.close_devtools();
+    }; */
     Ok("success".to_string())
 }

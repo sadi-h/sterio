@@ -17,12 +17,13 @@ pub fn run() {
             let player = Mutex::new(Player::new());
             app.manage(player);
 
-            #[cfg(debug_assertions)] //only include in debug mode
+            //INFO: uncomment for auto-open devtools
+            /* #[cfg(debug_assertions)] //only include in debug mode
             {
                 let window = app.get_webview_window("main").unwrap();
                 window.open_devtools();
                 window.close_devtools();
-            };
+            }; */
 
             let main_window = app.get_webview_window("main").unwrap();
             main_window
@@ -42,7 +43,8 @@ pub fn run() {
             commands::load,
             commands::select,
             commands::state,
-            commands::new_window,
+            commands::music_window,
+            commands::video_window,
             commands::position,
             commands::seek,
             commands::songs,

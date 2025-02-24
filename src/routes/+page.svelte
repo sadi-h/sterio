@@ -144,19 +144,28 @@ async function select(id: number) {
     }
 
 
-    async function newWindow() {
-    invoke("new_window") .then(res  => console.log(res)).catch(err => console.log(err))
+    async function musicWindow(e: Event) {
+        e.preventDefault();
+        invoke("music_window") .then(res  => console.log(res)).catch(err => console.log(err))
+    }
+    async function VideoWindow(e: Event) {
+        e.preventDefault();
+        invoke("video_window") .then(res  => console.log(res)).catch(err => console.log(err))
     }
 
 </script>
 
 
 <main>
-        <img src={library.current && library.current.song.album.cover ? library.ui.base64ToFile(library.current.song.album.cover.data) : "/img.webp"}  alt="standin-img">
-
+        <img
+        src={
+        library.current && library.current.song.album.cover ?
+            library.ui.base64ToFile(library.current.song.album.cover.data)
+            : "/img.webp"
+        }
+        alt="standin-img">
     <div>
     <section id="content">
-
         <article>
                 <div>
                     <!-- button to toggle actions -->
@@ -165,19 +174,22 @@ async function select(id: number) {
                         }}>
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0-7c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Z"/></svg>
                     </button>
-                    <h1>{library.current?.song.artist ? library.current.song.artist : "Unknown"}</h1>
-
+                    <h1 style="text-transform: uppercase;">{library.current?.song.artist ? library.current.song.artist : ""}</h1>
                 </div>
             <p id="song_name">
                     <!-- svelte-ignore a11y_distracting_elements -->
                     <!--TODO: make custom marquee -->
-                    <marquee behavior="scroll" direction="left">
-                        {library.current?.song.title ? library.current.song.title : "Unknown"}
-                    </marquee>
+                    {#if library.current}
+                         <!-- content here -->
+                        <marquee behavior="scroll" direction="left">
+                            {library.current.song.title}
+                        </marquee>
+                    {/if}
             </p>
-
         </article>
     </section>
+    {#if library.current}
+         <!-- content here -->
     <section id="controls">
             <nav>
                 <ul>
@@ -193,7 +205,6 @@ async function select(id: number) {
                     <svg  onclick={(e) => {
                                 play(e)
                     }} xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><path d="M133 440a35.37 35.37 0 0 1-17.5-4.67c-12-6.8-19.46-20-19.46-34.33V111c0-14.37 7.46-27.53 19.46-34.33a35.13 35.13 0 0 1 35.77.45l247.85 148.36a36 36 0 0 1 0 61l-247.89 148.4A35.5 35.5 0 0 1 133 440Z"/></svg>
-
                                             {:else}
                  <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -201,11 +212,8 @@ async function select(id: number) {
                     <svg  onclick={(e) => {
                         pause(e);
                     }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M48 64C21.5 64 0 85.5 0 112v288c0 26.5 21.5 48 48 48h32c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H48zm192 0c-26.5 0-48 21.5-48 48v288c0 26.5 21.5 48 48 48h32c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48h-32z"/></svg>
-
-
                    {/if}
                 </li>
-
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                 <li onclick={next}><svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><path d="M400 64a16 16 0 0 0-16 16v136.43L151.23 77.11a35.13 35.13 0 0 0-35.77-.44C103.46 83.47 96 96.63 96 111v290c0 14.37 7.46 27.53 19.46 34.33a35.14 35.14 0 0 0 35.77-.45L384 295.57V432a16 16 0 0 0 32 0V80a16 16 0 0 0-16-16Z"/></svg></li>
@@ -230,23 +238,28 @@ async function select(id: number) {
                 </div>
               </div>
                 <div id="time">
-                    <small>{library.current ? library.ui.timePretty(library.current.song.len.secs) : ""}</small>
-                    <small>{
-                        library.position ? library.ui.timePretty(library.position.secs) : ""}</small>
+                    {#if library.current}
+                        <small>{library.current ? library.ui.timePretty(library.current.song.len.secs) : ""}</small>
+                        <small>{
+                            library.position ? library.ui.timePretty(library.position.secs) : ""}</small>
+                    {/if}
                 </div>
             </nav>
     </section>
+    {/if}
     </div>
     <nav id="actions" class={library.ui.showActions ? "show_actions" : "hide_actions"}>
         <button aria-labelledby="close actions" onclick={() => library.ui.showActions = false}><svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><path d="M256 48C141.31 48 48 141.31 48 256s93.31 208 208 208 208-93.31 208-208S370.69 48 256 48Zm75.31 260.69a16 16 0 1 1-22.62 22.62L256 278.63l-52.69 52.68a16 16 0 0 1-22.62-22.62L233.37 256l-52.68-52.69a16 16 0 0 1 22.62-22.62L256 233.37l52.69-52.68a16 16 0 0 1 22.62 22.62L278.63 256Z"/></svg></button>
         <ul>
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<li onclick={newWindow}>
+<li onclick={musicWindow}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M499.1 6.3c8.1 6 12.9 15.6 12.9 25.7v336c0 44.2-43 80-96 80s-96-35.8-96-80 43-80 96-80c11.2 0 22 1.6 32 4.6V147l-256 76.8V432c0 44.2-43 80-96 80S0 476.2 0 432s43-80 96-80c11.2 0 22 1.6 32 4.6V128c0-14.1 9.3-26.6 22.8-30.7l320-96c9.7-2.9 20.2-1.1 28.3 5z"/></svg>
                     <span>Audio</span>
             </li>
-            <li>
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+            <li onclick={VideoWindow}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><path d="M464 384.39a32 32 0 0 1-13-2.77 15.77 15.77 0 0 1-2.71-1.54l-82.71-58.22A32 32 0 0 1 352 295.7v-79.4a32 32 0 0 1 13.58-26.16l82.71-58.22a15.77 15.77 0 0 1 2.71-1.54 32 32 0 0 1 45 29.24v192.76a32 32 0 0 1-32 32ZM268 400H84a68.07 68.07 0 0 1-68-68V180a68.07 68.07 0 0 1 68-68h184.48A67.6 67.6 0 0 1 336 179.52V332a68.07 68.07 0 0 1-68 68Z"/>
                     <span>Video</span></svg>
             </li>
@@ -262,7 +275,7 @@ async function select(id: number) {
             </li>
         </ul>
     </nav>
-           </main>
+</main>
 
 <style>
     main {
@@ -286,7 +299,7 @@ async function select(id: number) {
         background:rgba(255 255 255 /0.1);
         box-shadow: 0 8px 32px 0 rgb(31 38 135 / 0.37);
         backdrop-filter: blur(var(--blur));
-        -webkit-backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(var(--blur));
     }
 
     main nav#actions button {
@@ -304,7 +317,7 @@ async function select(id: number) {
     main nav#actions button svg {
         width: 100%;
         height: 100%;
-        fill: black;
+        fill: var(--hover-color);
     }
 
     .show_actions {
@@ -378,11 +391,12 @@ async function select(id: number) {
         min-width: 195px;
         max-width: 195px;
         margin-block: 5px;
+        color: var(--white-color);
+        font-size: 18px;
     }
 
     main section#content article h1 {
-        color: rgb(255 255 255 / 0.8);
-        opacity: 0.8;
+        color: var(--white-color);
         max-height: 45px;
         overflow-y: hidden;
         overflow-wrap: break-word;
@@ -404,8 +418,7 @@ async function select(id: number) {
 main section#content article p {
         font-size: 16px;
         max-height: 20px;
-        color: var(--text-color);
-        opacity: 0.8;
+        color: var(--white-color);
         overflow-y: hidden;
         overflow-wrap: break-word;
     }
@@ -433,7 +446,15 @@ main section#content:hover article div button {
         display: block;
     }
 
-main section#content article div button svg{
+main section#content article div button svg:hover {
+        fill: var(--hover-color);
+    }
+
+main section#content article div button svg:active {
+        fill: var(--active-color);
+    }
+
+main section#content article div button svg {
         width: 30px;
         fill: var(--text-color);
     }

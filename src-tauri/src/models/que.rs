@@ -47,7 +47,7 @@ impl TrackQueue {
                                 && path.extension().unwrap() == OsStr::new("mp3")
                             {
                                 len += 1;
-                                self.queue.push((id, Track::new(entry.path())?));
+                                self.queue.push((len, Track::new(entry.path())?));
                             }
                         }
                     }
