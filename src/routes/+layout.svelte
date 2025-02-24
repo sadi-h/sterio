@@ -15,7 +15,7 @@ main {
     padding: 10px;
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     background-color: #264F73;
 }
 div {

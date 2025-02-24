@@ -6,7 +6,7 @@ use std::{io::BufReader, path::PathBuf, time::Duration};
 pub struct Sound {
     pub name: String,
     pub len: Duration,
-    file: PathBuf,
+    pub file: PathBuf,
 }
 
 impl Sound {

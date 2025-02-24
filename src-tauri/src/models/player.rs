@@ -1,29 +1,20 @@
-use std::{
-    sync::{
-        mpsc::{Receiver, Sender},
-        Arc, Mutex,
-    },
-    // thread,
-};
+use std::sync::{mpsc::Sender, Arc, Mutex};
+
+use tauri::ipc::Channel;
 
 use super::{action::Action, library::Library};
+pub type ActionSender = Sender<(Action, Channel<String>, tauri::AppHandle)>;
 
 pub struct Player {
     // send actions to player thread
-    pub action_sender: Arc<Mutex<Sender<Action>>>,
-    // receive responses from player
-    pub stat_receiver: Arc<Mutex<Receiver<String>>>,
-    // handle to player thread
-    // handle: thread::JoinHandle<()>,
+    pub sender: ActionSender,
 }
 
 impl Player {
     pub fn new() -> Player {
-        let (action_sender, stat_receiver /*handle */) = Library::init();
+        let action_sender = Library::init();
         Self {
-            action_sender: Arc::new(Mutex::new(action_sender)),
-            stat_receiver: Arc::new(Mutex::new(stat_receiver)),
-            // handle,
+            sender: action_sender,
         }
     }
 }

@@ -2,7 +2,18 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 :root {
-  --border-radius: 5px;
+  --gap: 5px;
+  --blur: 7px;
+  --border-radius: 10px;
+  --svg-size: 20px;
+  --hover-color: #42cde7;
+  --active-color: #abf1be;
+  --text-color: #eff4f5;
+  --tertiary-color: #e9bfa6;
+  --background-color: #264f73;
 }

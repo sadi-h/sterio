@@ -1,20 +1,41 @@
 use std::{path::PathBuf, str::FromStr, time::Duration};
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Action {
     Stop,
-    Quit,
+    State,
+    Songs,
     Play,
     Next,
     Back,
-    Pause,
-    Position,
     Empty,
+    Pause,
+    Current,
+    Cover,
+    Position,
     Select(usize),
-    Load(PathBuf),
+    Load(Vec<PathBuf>),
     Seek(Duration),
     Speed(Option<f32>),
     Volume(Option<f32>),
+}
+
+impl Action {
+    fn paths_exist(input: &str) -> bool {
+        let dirs = input.split(' ').collect::<Vec<_>>();
+        dirs.iter()
+            .all(|dir| PathBuf::from(dir).try_exists().is_ok())
+    }
+    fn string_to_paths(input: &str) -> Vec<PathBuf> {
+        input
+            .split(' ')
+            .collect::<Vec<_>>()
+            .iter()
+            .map(PathBuf::from)
+            .collect()
+    }
 }
 
 impl FromStr for Action {
@@ -22,23 +43,22 @@ impl FromStr for Action {
     fn from_str(s: &str) -> Result<Self, String> {
         match s.trim() {
             "" => Err("No action provided")?,
-            "quit" => Ok(Self::Quit),
             "next" => Ok(Self::Next),
             "back" => Ok(Self::Back),
             "stop" => Ok(Self::Stop),
             "play" => Ok(Self::Play),
+            "state" => Ok(Self::State),
             "empty" => Ok(Self::Empty),
             "pause" => Ok(Self::Pause),
             "position" => Ok(Self::Position),
+            "songs" => Ok(Self::Songs),
+            "current" => Ok(Self::Current),
+            "Cover" => Ok(Self::Cover),
             "volume" => Ok(Self::Volume(None)),
             "speed" => Ok(Self::Speed(None)),
             n => match n.split(' ').collect::<Vec<_>>()[..] {
-                ["load", directory]
-                    if PathBuf::from(directory)
-                        .try_exists()
-                        .map_err(|e| format!("Location provided does not exit: {}", e))? =>
-                {
-                    Ok(Self::Load(PathBuf::from(directory)))
+                ["load", directory] if Self::paths_exist(directory) => {
+                    Ok(Self::Load(Self::string_to_paths(directory)))
                 }
 
                 ["select", position] => {

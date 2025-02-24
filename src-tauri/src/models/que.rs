@@ -1,73 +1,64 @@
 use std::{ffi::OsStr, path::Path};
 
-use super::{
-    song::{self, Song},
-    sound::Sound,
-    Response,
-};
+use serde::{Deserialize, Serialize};
 
-#[derive(Default, serde::Deserialize, serde::Serialize)]
-pub struct Queue {
+use super::{song::Track, Response};
+
+#[derive(Default, Deserialize, Serialize)]
+pub struct TrackQueue {
     pub current: Option<usize>,
-    pub queue: Vec<(usize, Sound)>,
+    pub queue: Vec<(usize, Track)>,
 }
 
-impl std::fmt::Display for Queue {
+impl TrackQueue {
+    pub fn track(&self, position: usize) -> Option<&Track> {
+        self.queue.get(position).map(|(_, sound)| sound)
+    }
+    pub fn load<P: AsRef<Path>>(&mut self, dirs: Vec<P>) -> Response<()> {
+        let mut id = match self.queue.is_empty() {
+            true => 0,
+            _ => self.queue.len() - 1,
+        };
+        match id {
+            0 => {
+                for dir in dirs {
+                    for entry in std::fs::read_dir(dir)? {
+                        let entry = entry?;
+                        if entry.path().is_file() {
+                            let path = entry.path();
+                            if path.extension().is_some()
+                                && path.extension().unwrap() == OsStr::new("mp3")
+                            {
+                                self.queue.push((id, Track::new(entry.path())?));
+                                id += 1;
+                            }
+                        }
+                    }
+                }
+                Ok(())
+            }
+            mut len => {
+                for dir in dirs {
+                    for entry in std::fs::read_dir(dir)? {
+                        let entry = entry?;
+                        if entry.path().is_file() {
+                            let path = entry.path();
+                            if path.extension().is_some()
+                                && path.extension().unwrap() == OsStr::new("mp3")
+                            {
+                                len += 1;
+                                self.queue.push((id, Track::new(entry.path())?));
+                            }
+                        }
+                    }
+                }
+                Ok(())
+            }
+        }
+    }
+}
+impl std::fmt::Display for TrackQueue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.queue
-                .iter()
-                .map(|(i, song)| format!("{}-{}-{}", i, song.name.clone(), song.len.as_secs_f32(),))
-                .collect::<Vec<_>>()
-                .join("\n")
-        )
-    }
-}
-
-impl Queue {
-    fn new() -> Self {
-        Default::default()
-    }
-
-    pub fn sound(&self, position: usize) -> Option<&Sound> {
-        match self.queue.get(position).as_ref() {
-            Some((_, sound)) => Some(sound),
-            _ => None,
-        }
-    }
-
-    pub fn load<P: AsRef<Path>>(&mut self, dir: P) -> Response<()> {
-        let files = std::fs::read_dir(dir)?;
-        if self.queue.is_empty() {
-            let mut index = 0;
-            for entry in files {
-                let entry = entry?;
-                if entry.path().is_file() {
-                    let path = entry.path();
-                    if path.extension().is_some() && path.extension().unwrap() == OsStr::new("mp3")
-                    {
-                        self.queue.push((index, Sound::new(entry.path())));
-                        index += 1;
-                    }
-                }
-            }
-            return Ok(());
-        } else {
-            let mut len = self.queue.len() - 1;
-            for entry in files {
-                let entry = entry?;
-                if entry.path().is_file() {
-                    let path = entry.path();
-                    if path.extension().is_some() && path.extension().unwrap() == OsStr::new("mp3")
-                    {
-                        len += 1;
-                        self.queue.push((len, Sound::new(entry.path())));
-                    }
-                }
-            }
-            return Ok(());
-        }
+        write!(f, "{}", serde_json::to_string(&self.queue).unwrap())
     }
 }
