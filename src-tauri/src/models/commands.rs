@@ -12,7 +12,6 @@ pub fn load(
     state: State<'_, Mutex<Player>>,
     dispatcher: Channel<String>,
 ) -> Result<String, String> {
-    println!("Load function called");
     let player = { state.lock().unwrap() };
     player
         .sender
