@@ -1,6 +1,6 @@
 mod models;
 use models::commands;
-use std::sync::Mutex;
+use std::{str::MatchIndices, sync::Mutex};
 use tauri::{Manager, PhysicalPosition};
 
 use models::player::Player;
@@ -26,6 +26,7 @@ pub fn run() {
             }; */
 
             let main_window = app.get_webview_window("main").unwrap();
+            //TODO: get main window position and use to relatively position new window
             main_window
                 .set_position(PhysicalPosition { x: 2565, y: 0 })
                 .map_err(|e| e.to_string())?;

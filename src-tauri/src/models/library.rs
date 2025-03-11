@@ -58,6 +58,7 @@ impl std::fmt::Display for Library {
 }
 
 impl Library {
+    //TODO: better error handling [anyhow]
     pub fn init() -> mpsc::Sender<(Action, Channel<String>, AppHandle)> {
         //action sender and receivers
         let (sender, receiver) = mpsc::channel::<(Action, Channel<String>, AppHandle)>();
@@ -93,11 +94,13 @@ impl Library {
                         Action::Next => {
                             if library.forward().is_ok() {
                                 emitter.emit("next", library.current()).unwrap();
+                                emitter.emit("current", library.current()).unwrap();
                             }
                         }
                         Action::Back => {
                             if library.back().is_ok() {
                                 emitter.emit("back", library.current()).unwrap();
+                                emitter.emit("current", library.current()).unwrap();
                             }
                         }
                         Action::Pause => {
@@ -105,7 +108,10 @@ impl Library {
                             emitter.emit("pause", true).unwrap();
                         }
                         Action::Current => match library.current() {
-                            Some(curr) => dispatcher.send(json::to_string(&curr).unwrap()).unwrap(),
+                            Some(curr) => {
+                                dispatcher.send(json::to_string(&curr).unwrap()).unwrap();
+                                emitter.emit("current", library.current()).unwrap();
+                            }
                             _ => dispatcher.send("{current: None}".to_string()).unwrap(),
                         },
                         Action::Cover => match library.cover() {
@@ -131,6 +137,7 @@ impl Library {
                         Action::Select(position) => {
                             if library.select(position).is_ok() {
                                 emitter.emit("select", library.current()).unwrap();
+                                emitter.emit("current", library.current()).unwrap();
                             }
                         }
                         Action::Load(dirs) => match library.queue.load(dirs) {

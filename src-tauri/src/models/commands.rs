@@ -163,7 +163,7 @@ pub fn cover(
 
 #[tauri::command]
 pub fn music_window(app: AppHandle) -> Result<String, String> /* Result<String, String> */ {
-    let window = WebviewWindowBuilder::new(&app, "Music", WebviewUrl::App("/music".into()))
+    let window = WebviewWindowBuilder::new(&app, "music", WebviewUrl::App("/music".into()))
         .inner_size(390f64, 500f64)
         .build()
         .map_err(|e| e.to_string())?;
@@ -172,6 +172,9 @@ pub fn music_window(app: AppHandle) -> Result<String, String> /* Result<String, 
         .map_err(|e| e.to_string())?;
     window.show().map_err(|e| e.to_string())?;
     window.set_title("").map_err(|e| e.to_string())?;
+    //TODO: will use to remove default heading and impl custom heading
+    // window.set_decorations(false).map_err(|e| e.to_string())?;
+
     // INFO: uncomment for devtools during dev
     /* #[cfg(debug_assertions)] //only include in debug mode
     {
@@ -183,7 +186,7 @@ pub fn music_window(app: AppHandle) -> Result<String, String> /* Result<String, 
 
 #[tauri::command]
 pub fn video_window(app: AppHandle) -> Result<String, String> /* Result<String, String> */ {
-    let window = WebviewWindowBuilder::new(&app, "Video", WebviewUrl::App("/video".into()))
+    let window = WebviewWindowBuilder::new(&app, "video", WebviewUrl::App("/video".into()))
         .inner_size(390f64, 500f64)
         .build()
         .map_err(|e| e.to_string())?;

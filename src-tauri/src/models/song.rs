@@ -61,6 +61,7 @@ impl Track {
 }
 
 impl TryFrom<PathBuf> for Track {
+    //TODO: error handling and remove unwrap [anyhow]
     type Error = String;
     // add code here
     fn try_from(value: PathBuf) -> Result<Self, Self::Error> {

@@ -15,6 +15,8 @@ impl TrackQueue {
         self.queue.get(position).map(|(_, sound)| sound)
     }
     pub fn load<P: AsRef<Path>>(&mut self, dirs: Vec<P>) -> Response<()> {
+        //TODO: impl using thread. One thread to query filesytem and another to build base64 string
+        //for album cover [thread::scope]
         let mut id = match self.queue.is_empty() {
             true => 0,
             _ => self.queue.len() - 1,
